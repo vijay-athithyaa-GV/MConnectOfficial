@@ -1,0 +1,7 @@
+database.db
+static/uploads/
+.venv/
+__pycache__/
+.git/
+deploy.zip
+_deploy/

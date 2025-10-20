@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Listings - MConnect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <h1 class="logo"><a href="{{ url_for('buy') }}">MConnect</a></h1>
+      <nav class="nav">
+        <a href="{{ url_for('buy') }}">Buy</a>
+        <a href="{{ url_for('sell') }}">Sell</a>
+        <a class="btn" href="{{ url_for('upload') }}">List an Item</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="form-section">
+      <h2>My Listings</h2>
+      <form class="form" method="get" action="{{ url_for('my_listings') }}">
+        <label>
+          <span>Enter your seller email</span>
+          <input type="email" name="seller_email" placeholder="you@college.edu" value="{{ seller_email or '' }}" required />
+        </label>
+        <button type="submit" class="btn">View Listings</button>
+      </form>
+    </section>
+
+    {% if seller_email %}
+      <h3>Listings for {{ seller_email }}</h3>
+      <section class="grid">
+        {% if products %}
+          {% for p in products %}
+            <article class="card">
+              <div class="card-media">
+                {% if p.image_filename %}
+                  <img src="{{ p.image_url() }}" alt="{{ p.name }}" />
+                {% else %}
+                  <div class="placeholder">No Image</div>
+                {% endif %}
+                {% if p.status == 'sold' %}
+                  <div class="sold-ribbon">SOLD</div>
+                {% endif %}
+              </div>
+              <div class="card-body">
+                <h3 class="card-title"><a class="card-title-link" href="{{ url_for('product_detail', product_id=p.id) }}">{{ p.name }}</a></h3>
+                <div class="price">₹ {{ '%.2f'|format(p.price) }}</div>
+                <div class="category">{{ p.category }}</div>
+                <p class="description">{{ p.description }}</p>
+              </div>
+              <div class="card-footer">
+                {% if p.status != 'sold' %}
+                <form action="{{ url_for('mark_product_sold', product_id=p.id) }}" method="post" style="display:flex; gap:8px; align-items:center;">
+                  <input type="hidden" name="seller_email_confirm" value="{{ seller_email }}" />
+                  <button type="submit" class="btn">Mark as Sold</button>
+                  <a class="contact" href="mailto:{{ p.seller_email }}">Contact Buyer</a>
+                </form>
+                {% else %}
+                <span class="sold-pill">SOLD</span>
+                {% endif %}
+                <time class="time">{{ p.created_at.strftime('%Y-%m-%d') }}</time>
+              </div>
+            </article>
+          {% endfor %}
+        {% else %}
+          <p>No listings found.</p>
+        {% endif %}
+      </section>
+    {% endif %}
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

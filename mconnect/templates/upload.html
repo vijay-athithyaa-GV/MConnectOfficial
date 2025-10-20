@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MConnect - List an Item</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <h1 class="logo"><a href="{{ url_for('buy') }}">MConnect</a></h1>
+      <nav class="nav">
+        <a href="{{ url_for('buy') }}">Buy</a>
+        <a href="{{ url_for('sell') }}">Sell</a>
+        <a href="{{ url_for('my_listings') }}">My Listings</a>
+        <a class="btn" href="{{ url_for('buy') }}">Back to Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash">
+          {% for category, message in messages %}
+            <li class="flash-{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <section class="form-section">
+      <h2>List a Product</h2>
+      <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" class="form" id="upload-form">
+        <label>
+          <span>Product Name</span>
+          <input type="text" name="name" required />
+        </label>
+
+        <label>
+          <span>Category</span>
+          <input type="text" name="category" placeholder="e.g., Electronics, Books" required />
+        </label>
+
+        <label>
+          <span>Description</span>
+          <textarea name="description" rows="4" required></textarea>
+        </label>
+
+        <label>
+          <span>Price (INR)</span>
+          <input type="number" step="0.01" name="price" required />
+        </label>
+
+        <label>
+          <span>Product Image</span>
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="image-input" name="image" accept="image/*" />
+            <div class="dz-instructions">
+              <div class="dz-icon">⬆</div>
+              <div>Drag & drop image here, or click to browse</div>
+            </div>
+            <img id="image-preview" class="image-preview" alt="Preview" />
+          </div>
+        </label>
+
+        <label>
+          <span>Seller Email</span>
+          <input type="email" name="seller_email" placeholder="you@college.edu" required />
+        </label>
+
+        <button type="submit" class="btn">Submit</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MConnect - Marketplace</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <h1 class="logo"><a href="{{ url_for('buy') }}">MConnect</a></h1>
+      <nav class="nav">
+        <a href="{{ url_for('buy') }}">Buy</a>
+        <a href="{{ url_for('sell') }}">Sell</a>
+        <a href="{{ url_for('my_listings') }}">My Listings</a>
+        <a class="btn" href="{{ url_for('upload') }}">List an Item</a>
+      </nav>
+    </div>
+  </header>
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <h2 class="hero-title">Buy & Sell on Campus</h2>
+        <p class="hero-sub">Find great deals from fellow students. List items in seconds.</p>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <section class="search">
+      <form action="{{ url_for('search') }}" method="get" class="search-form">
+        <input type="text" name="q" placeholder="Search by keyword..." value="{{ q or '' }}" />
+        <select name="category">
+          <option value="">All Categories</option>
+          {% for cat in categories %}
+            <option value="{{ cat }}" {% if selected_category==cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn">Search</button>
+      </form>
+    </section>
+
+    <section class="grid">
+      {% if products %}
+        {% for p in products %}
+          <article class="card reveal" data-id="{{ p.id }}" data-name="{{ p.name|lower }}" data-category="{{ p.category|lower }}" data-desc="{{ p.description|lower }}">
+            <a class="card-hit" href="{{ url_for('product_detail', product_id=p.id) }}" aria-label="View details for {{ p.name }}"></a>
+            <div class="card-media">
+              {% if p.image_filename %}
+                <img src="{{ p.image_url() }}" alt="{{ p.name }}" />
+              {% else %}
+                <div class="placeholder">No Image</div>
+              {% endif %}
+              {% if p.status == 'sold' %}
+                <div class="sold-ribbon">SOLD</div>
+              {% endif %}
+            </div>
+            <div class="card-body">
+              <h3 class="card-title"><a class="card-title-link" href="{{ url_for('product_detail', product_id=p.id) }}">{{ p.name }}</a></h3>
+              <div class="price">₹ {{ '%.2f'|format(p.price) }}</div>
+              <div class="category">{{ p.category }}</div>
+              <p class="description">{{ p.description }}</p>
+            </div>
+            <div class="card-footer">
+              <a href="mailto:{{ p.seller_email }}" class="contact" {% if p.status == 'sold' %}aria-disabled="true" style="pointer-events:none;opacity:.6;"{% endif %}>Contact Seller</a>
+              <time class="time">{{ p.created_at.strftime('%Y-%m-%d') }}</time>
+            </div>
+          </article>
+        {% endfor %}
+      {% else %}
+        <p>No products found.</p>
+      {% endif %}
+    </section>
+  </main>
+
+  <!-- Modal for product quick view on Buy page -->
+  <div id="product-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-dialog" role="document">
+      <button class="modal-close" aria-label="Close" data-close>×</button>
+      <button class="modal-nav modal-prev" aria-label="Previous" data-prev>❮</button>
+      <button class="modal-nav modal-next" aria-label="Next" data-next>❯</button>
+      <div class="modal-content">
+        <div class="modal-media"><img id="m-img" alt="" /></div>
+        <div class="modal-info">
+          <h3 id="m-title"></h3>
+          <div class="modal-meta">
+            <span class="badge" id="m-category"></span>
+            <span class="price-lg" id="m-price"></span>
+          </div>
+          <p id="m-desc" class="detail-desc"></p>
+          <a id="m-contact" class="btn" href="#" target="_blank" rel="noopener">Contact Seller</a>
+          <a id="m-view" class="contact" href="#">View full details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
